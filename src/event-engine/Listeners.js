@@ -29,8 +29,7 @@ module.exports = {initEvents:()=>{
                       const data = await success.json(); 
                     //   console.log("Repsonse for updating the device is id: ",data);
                     console.log(data); 
-                    // store device id in glo
-                    // console.log("Device id updated"); 
+                     
                   },(error)=>{           
                     console.log("Could not update the device id");
                   })    

@@ -11,6 +11,7 @@ const {
   GET_UNIQUE_ID,
   LOAD_SERVICE_PROVIDERS_LIST,
   ADD_HOST_IN_REQUEST_LIST,
+  REMOVE_HOST_FROM_REQUEST_LIST,
 } = require("./request-manager/requestUrls");
 const CENTRAL_API = require("./request-manager/urls");
 
@@ -93,11 +94,11 @@ $("#listOfServiceManagers_btn").click(() => {
     <td>
       <button
         type="button"
-        style="width: 5rem"
+        style="width: 8rem"
         class="btn btn-outline-primary"
         id="connectBtn"
         onClick= ${
-          manager.connectedHostList == null
+          manager.connectedHostList[0] != null
             ? `makeDisConnectionRequest(${index})`
             : `makeConnectionRequest(${index})`
         }
@@ -151,24 +152,25 @@ const makeConnectionRequest = (index) => {
   // alert("connect"+target.email);
   getStoredHostId().then((hostId)=>{
     getStoredHostUserName().then((hostName)=>{
-      sendResquestToCentralAPI("POST",ADD_HOST_IN_REQUEST_LIST,{
+      $("#pleaseWaitModal_msg").text("Please wait we are connecting to admin")
+      $("#pleaseWaitModal").modal("show");
+      sendRequestToCentralAPI("POST",ADD_HOST_IN_REQUEST_LIST,{
         hostDeviceId: global.device_Id,
         adminId: target.id,
-        hostName:hostName, 
+        hostName:hostName+"@"+target.email, 
         hostId:hostId, //which we got from server
       }).then(async (success)=>{
         const data = await success.json();
         console.log(data);
-        // store device id in glo
-        // emiter.emit(Events.UPDATE_DEVICE_ID)
-        // res.status(200).send({ 
-        //     responseMessage:data.responseMessage,
-        //     payload:data
-        // })
+        
+        $("#pleaseWaitModal_msg").text(data.responseMessage)
+        // $("#infoModal").modal("show");
+        setTimeout(() => {
+          $("#pleaseWaitModal").modal("hide");
+        }, 3000);
+     
       },(error)=>{  
-        // res.status(501).send({
-        //     payload:error 
-        // })
+        alert(error)
       })
     })
 
@@ -179,5 +181,27 @@ const makeConnectionRequest = (index) => {
 
 const makeDisConnectionRequest = (index) => {
   let target = listOfServiceManagers[index];
-  alert("dis"+target.email);
+  // alert("dis"+target.email);
+
+  getStoredHostId().then((hostId)=>{
+    $("#pleaseWaitModal_msg").text("Please wait we are dis connecting from admin")
+    $("#pleaseWaitModal").modal("show");
+    sendRequestToCentralAPI("POST",REMOVE_HOST_FROM_REQUEST_LIST,{
+      adminId: target.id,
+      hostId:hostId, //which we got from server
+      status:"Decline"
+    }).then(async (success)=>{
+      const data = await success.json();
+      console.log(data);
+      $("#pleaseWaitModal_msg").text(data.responseMessage)
+      // $("#infoModal").modal("show");
+      setTimeout(() => {
+        $("#pleaseWaitModal").modal("hide");
+      }, 3000);
+   
+    },(error)=>{  
+      alert(error)
+    })
+  })
+  
 };

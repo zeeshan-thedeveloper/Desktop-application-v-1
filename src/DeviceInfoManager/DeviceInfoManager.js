@@ -1,0 +1,26 @@
+// var store = require('store');
+var fs = require("fs");
+const storeHostId=(value)=>{
+
+    fs.writeFile(__dirname+"/hostId.txt", value, (err) => {
+        if (err) console.log(err);
+        console.log("Successfully Written host id to File.",value);
+    });
+}
+
+const getStoredHostId=()=>{
+
+    return new Promise((resolve,reject) => {
+        fs.readFile(__dirname+"/hostId.txt", "utf-8", (err, data) => {
+            if (err) { reject(err)}
+            // console.log("value retrieved back : ",data)
+            resolve(data)
+          });
+    })
+    
+}
+
+module.exports ={
+    storeHostId,
+    getStoredHostId
+}

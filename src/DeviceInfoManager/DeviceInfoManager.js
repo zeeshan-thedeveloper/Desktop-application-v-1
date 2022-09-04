@@ -1,26 +1,46 @@
 // var store = require('store');
 var fs = require("fs");
-const storeHostId=(value)=>{
+const storeHostId = (value) => {
+  fs.writeFile(__dirname + "/hostId.txt", value, (err) => {
+    if (err) console.log(err);
+    console.log("Successfully Written host id to File.", value);
+  });
+};
 
-    fs.writeFile(__dirname+"/hostId.txt", value, (err) => {
-        if (err) console.log(err);
-        console.log("Successfully Written host id to File.",value);
+const getStoredHostId = () => {
+  return new Promise((resolve, reject) => {
+    fs.readFile(__dirname + "/hostId.txt", "utf-8", (err, data) => {
+      if (err) {
+        reject(err);
+      }
+      // console.log("value retrieved back : ",data)
+      resolve(data);
     });
-}
+  });
+};
 
-const getStoredHostId=()=>{
+const storeHostUserName = (value) => {
+  fs.writeFile(__dirname + "/hostUserName.txt", value, (err) => {
+    if (err) console.log(err);
+    console.log("Successfully Written host user name to File.", value);
+  });
+};
 
-    return new Promise((resolve,reject) => {
-        fs.readFile(__dirname+"/hostId.txt", "utf-8", (err, data) => {
-            if (err) { reject(err)}
-            // console.log("value retrieved back : ",data)
-            resolve(data)
-          });
-    })
-    
-}
+const getStoredHostUserName = () => {
+  return new Promise((resolve, reject) => {
+    fs.readFile(__dirname + "/hostUserName.txt", "utf-8", (err, data) => {
+      if (err || data.length==0) {
+        reject(null);
+      }
+      // console.log("value retrieved back : ",data)
+      resolve(data);
+    });
+  });
+};
 
-module.exports ={
-    storeHostId,
-    getStoredHostId
-}
+module.exports = {
+  storeHostId,
+  getStoredHostId,
+  storeHostUserName,
+  getStoredHostUserName,
+};

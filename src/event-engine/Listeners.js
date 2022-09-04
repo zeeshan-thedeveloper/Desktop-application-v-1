@@ -1,7 +1,9 @@
-const { sendResquestToCentralAPI } = require('../request-manager/requestManager');
+const { sendRequestToCentralAPI } = require('../request-manager/requestManager');
 const { getStoredHostId } = require('../DeviceInfoManager/DeviceInfoManager');
 var emiter = require('./Emiters');
 const events = require('./Events');
+const emitter = require('./Emiters');
+const Events = require('./Events');
 
 global.device_Id=null;  
 global.hostId=null; 
@@ -19,7 +21,7 @@ module.exports = {initEvents:()=>{
             let seconds = date_ob.getSeconds();
             let timeAndData = year + "-" + month + "-" + date + " " + hours + ":" + minutes + ":" + seconds;
             if(hostId){
-                sendResquestToCentralAPI("POST", "/host-api/updateDeviceIdInCache",{
+                sendRequestToCentralAPI("POST", "/host-api/updateDeviceIdInCache",{
                     hostDeviceId: global.device_Id,
                     hostId:hostId, //which we got from server
                     lastSeenDateAndTime:timeAndData 
@@ -36,7 +38,11 @@ module.exports = {initEvents:()=>{
                 console.log("Error in  updating the device id : ",hostId)
             } 
             },(error)=>{
-                console.log("Error in  updating the device id and error is :",error)
+                sendRequestToCentralAPI("GET",GET_UNIQUE_ID,{}).then((resp)=>resp.json()).then((data)=>{
+                    console.log("Fetched a unique id from server and stored it on hard drive")
+                    storeHostId(data.payload);
+                    emitter.emit(Events.UPDATE_DEVICE_ID)
+                })
             })
     });
 }}

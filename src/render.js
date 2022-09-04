@@ -4,10 +4,17 @@ const {
   storeHostId,
   storeHostUserName,
   getStoredHostUserName,
+  getStoredHostId,
 } = require("./DeviceInfoManager/DeviceInfoManager");
 const { sendRequestToCentralAPI } = require("./request-manager/requestManager");
-const { GET_UNIQUE_ID } = require("./request-manager/requestUrls");
+const {
+  GET_UNIQUE_ID,
+  LOAD_SERVICE_PROVIDERS_LIST,
+  ADD_HOST_IN_REQUEST_LIST,
+} = require("./request-manager/requestUrls");
 const CENTRAL_API = require("./request-manager/urls");
+
+let listOfServiceManagers=[];
 
 $(document).ready(function () {
   // here we will hide the screens and check some important details.
@@ -22,7 +29,7 @@ $(document).ready(function () {
   $("#localServer_subScreen").hide();
   $("#liveLogs_subScreen").hide();
 
-
+  $("#loadingGifForListOfServicecManagers").hide();
 });
 
 $("#continueBtn").click(() => {
@@ -44,38 +51,94 @@ $("#continueBtn").click(() => {
     });
 });
 
-
 //sub screen buttons.
+$("#my_table_1")
+  .find("#connectBtn")
+  .click(function () {
+    // console.log(this)
+    alert("hm");
+    // var id = $(this).closest("tr").find("td:eq(2)").text();
+    // alert(id)
+  });
 
-$("#listOfServiceManagers_btn").click(()=>{
+$("#listOfServiceManagers_btn").click(() => {
+ 
   $("#listOfServiceManagers_subScreen").show(200);
   $("#mysqlSettings_subScreen").hide("slow", function () {});
   $("#manageDatabases_subScreen").hide("slow", function () {});
   $("#localServer_subScreen").hide("slow", function () {});
   $("#liveLogs_subScreen").hide("slow", function () {});
+
+  //lets render data into it.
+  $("#my_table_1").find("tr:gt(0)").remove();
+
+  getStoredHostId()
+    .then((hostId) => {
+      $("#loadingGifForListOfServicecManagers").show();
+      $("#my_table_1").hide();
+      sendRequestToCentralAPI("POST", LOAD_SERVICE_PROVIDERS_LIST, {
+        hostId: hostId,
+      })
+        .then((resp) => resp.json())
+        .then((response) => {
+          console.log("response", response);
+          listOfServiceManagers = response.responsePayload
+          response.responsePayload.forEach((manager, index) => {
+            let tableRow = ` <tr style="margin-top: 8%">
+    <th scope="row">${index + 1}</th>
+    <td>${manager.email}</td>
+    <td>${
+      manager.connectedHostList[0] != null ? "Connected" : "Not Connected"
+    }</td>
+    <td>
+      <button
+        type="button"
+        style="width: 5rem"
+        class="btn btn-outline-primary"
+        id="connectBtn"
+        onClick= ${
+          manager.connectedHostList == null
+            ? `makeDisConnectionRequest(${index})`
+            : `makeConnectionRequest(${index})`
+        }
+      >
+      ${manager.connectedHostList[0] != null ? "Dis-Connect" : "Connect"}
+      </button>
+    </td>
+  </tr>`;
+            $("#my_table_1").append(tableRow);
+            $("#loadingGifForListOfServicecManagers").hide();
+            $("#my_table_1").show();
+          });
+        });
+    })
+    .catch((error) => {
+      alert("Could not find host id");
+    });
+
 });
-$("#mysqlSettings_btn").click(()=>{
+$("#mysqlSettings_btn").click(() => {
   $("#listOfServiceManagers_subScreen").hide("slow", function () {});
   $("#mysqlSettings_subScreen").show(200);
   $("#manageDatabases_subScreen").hide("slow", function () {});
   $("#localServer_subScreen").hide("slow", function () {});
   $("#liveLogs_subScreen").hide("slow", function () {});
 });
-$("#manageDatabases_btn").click(()=>{
+$("#manageDatabases_btn").click(() => {
   $("#listOfServiceManagers_subScreen").hide("slow", function () {});
   $("#mysqlSettings_subScreen").hide("slow", function () {});
   $("#manageDatabases_subScreen").show(200);
   $("#localServer_subScreen").hide("slow", function () {});
   $("#liveLogs_subScreen").hide("slow", function () {});
 });
-$("#localServer_btn").click(()=>{
+$("#localServer_btn").click(() => {
   $("#listOfServiceManagers_subScreen").hide("slow", function () {});
   $("#mysqlSettings_subScreen").hide("slow", function () {});
   $("#manageDatabases_subScreen").hide("slow", function () {});
   $("#localServer_subScreen").show(200);
   $("#liveLogs_subScreen").hide("slow", function () {});
 });
-$("#liveLogs_btn").click(()=>{
+$("#liveLogs_btn").click(() => {
   $("#listOfServiceManagers_subScreen").hide("slow", function () {});
   $("#mysqlSettings_subScreen").hide("slow", function () {});
   $("#manageDatabases_subScreen").hide("slow", function () {});
@@ -83,3 +146,38 @@ $("#liveLogs_btn").click(()=>{
   $("#liveLogs_subScreen").show(200);
 });
 
+const makeConnectionRequest = (index) => {
+  let target = listOfServiceManagers[index];
+  // alert("connect"+target.email);
+  getStoredHostId().then((hostId)=>{
+    getStoredHostUserName().then((hostName)=>{
+      sendResquestToCentralAPI("POST",ADD_HOST_IN_REQUEST_LIST,{
+        hostDeviceId: global.device_Id,
+        adminId: target.id,
+        hostName:hostName, 
+        hostId:hostId, //which we got from server
+      }).then(async (success)=>{
+        const data = await success.json();
+        console.log(data);
+        // store device id in glo
+        // emiter.emit(Events.UPDATE_DEVICE_ID)
+        // res.status(200).send({ 
+        //     responseMessage:data.responseMessage,
+        //     payload:data
+        // })
+      },(error)=>{  
+        // res.status(501).send({
+        //     payload:error 
+        // })
+      })
+    })
+
+    
+  })
+  
+};
+
+const makeDisConnectionRequest = (index) => {
+  let target = listOfServiceManagers[index];
+  alert("dis"+target.email);
+};

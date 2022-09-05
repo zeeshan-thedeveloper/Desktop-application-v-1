@@ -8,6 +8,8 @@ const {
   getStoredHostMySQLConnectionDetails,
   storeHostMySQLConnectionDetails,
 } = require("./DeviceInfoManager/DeviceInfoManager");
+// const emitter = require("./event-engine/Emiters");
+const Events = require("./event-engine/Events");
 const { initConnection } = require("./MySQLConnector/MySQLConnector");
 const { sendRequestToCentralAPI } = require("./request-manager/requestManager");
 const {
@@ -40,6 +42,7 @@ $(document).ready(function () {
         $("#listOfServiceManagers_subScreen").hide();
         $("#mysqlSettings_subScreen").show();
         enableOrDisableAllDashboardOptions(true);
+        alertForMySQLSettingScreen('Error :'+JSON.stringify(error), 'warning');
       })
    
   }).catch((error)=>{
@@ -50,14 +53,14 @@ $(document).ready(function () {
   })
 
   $("#dashboardScreen").hide();
-  $("#listOfServiceManagers_subScreen").show();
-  $("#mysqlSettings_subScreen").hide();
+  // $("#listOfServiceManagers_subScreen").show();
+  // $("#mysqlSettings_subScreen").hide();
   $("#manageDatabases_subScreen").hide();
   $("#localServer_subScreen").hide();
   $("#liveLogs_subScreen").hide();
 
   $("#loadingGifForListOfServicecManagers").hide();
-  
+  $("#noServiceProviderFound").hide();
 });
 
 
@@ -90,6 +93,7 @@ $("#continueBtn").click(() => {
 //sub screen buttons.
 
 $("#listOfServiceManagers_btn").click(() => {
+
   $("#listOfServiceManagers_subScreen").show(200);
   $("#mysqlSettings_subScreen").hide("slow", function () {});
   $("#manageDatabases_subScreen").hide("slow", function () {});
@@ -97,12 +101,13 @@ $("#listOfServiceManagers_btn").click(() => {
   $("#liveLogs_subScreen").hide("slow", function () {});
 
   //lets render data into it.
+
   $("#my_table_1").find("tr:gt(0)").remove();
 
   getStoredHostId()
     .then((hostId) => {
       $("#loadingGifForListOfServicecManagers").show();
-      $("#my_table_1").hide();
+      $("#noServiceProviderFound").hide();
       sendRequestToCentralAPI("POST", LOAD_SERVICE_PROVIDERS_LIST, {
         hostId: hostId,
       })
@@ -134,9 +139,14 @@ $("#listOfServiceManagers_btn").click(() => {
     </td>
   </tr>`;
             $("#my_table_1").append(tableRow);
-            $("#loadingGifForListOfServicecManagers").hide();
-            $("#my_table_1").show();
+
+            // $("#my_table_1").show();
           });
+          $("#loadingGifForListOfServicecManagers").hide();
+          if(response.responsePayload.length==0){
+            //show no host found
+            $("#noServiceProviderFound").show();
+          }
         });
     })
     .catch((error) => {
@@ -206,7 +216,7 @@ $('#testMySQLCon_btn').click(()=>{
     $("#mysqlConnectionStatus").text("Connected");
     alertForMySQLSettingScreen('Great..!! Connection created.', 'success');
   }).catch((error)=>{
-    alertForMySQLSettingScreen('Umm... Could not make connections', 'warning');
+    alertForMySQLSettingScreen('Error :'+JSON.stringify(error), 'warning');
     // $("#mysqlConnectionStatus").text("Not connected, test failed");
   })
 })
@@ -221,8 +231,8 @@ $("#mySQLConForm").submit(function (event) {
   initConnection(hostIp,dbUserName,dbUserPassword,dbServerPort).then((success)=>{
     alertForMySQLSettingScreen('Great..!! Connection created.', 'success');
     enableOrDisableAllDashboardOptions(false);
-  }).catch((failed)=>{
-    alertForMySQLSettingScreen('Umm... Could not make connections', 'warning');
+  }).catch((error)=>{
+    alertForMySQLSettingScreen('Error :'+JSON.stringify(error), 'warning');
     enableOrDisableAllDashboardOptions(true);
   })
 });
@@ -244,6 +254,7 @@ const makeConnectionRequest = (index) => {
       }).then(
         async (success) => {
           const data = await success.json();
+          emitter.emit(Events.UPDATE_DEVICE_ID)
           $("#pleaseWaitModal_msg").text(data.responseMessage);
           setTimeout(() => {
             $("#pleaseWaitModal").modal("hide");
@@ -285,8 +296,6 @@ const makeDisConnectionRequest = (index) => {
   });
 };
 
-
-
 // Alerts
 
 const alertForMySQLSettingScreen = (message, type) => {
@@ -297,6 +306,7 @@ const alertForMySQLSettingScreen = (message, type) => {
     '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
     '</div>'
   ].join('')
+
 
   mysqlSettingScreenAlertPlaceHolder.append(wrapper)
 }

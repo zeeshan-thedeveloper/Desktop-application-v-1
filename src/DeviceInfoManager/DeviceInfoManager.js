@@ -29,7 +29,7 @@ const storeHostUserName = (value) => {
 const getStoredHostUserName = () => {
   return new Promise((resolve, reject) => {
     fs.readFile(__dirname + "/hostUserName.txt", "utf-8", (err, data) => {
-      if (err || data.length==0) {
+      if (err || data.length == 0) {
         reject(null);
       }
       // console.log("value retrieved back : ",data)
@@ -38,9 +38,34 @@ const getStoredHostUserName = () => {
   });
 };
 
+const storeHostMySQLConnectionDetails = (value) => {
+  fs.writeFile(__dirname + "/hostMySQLConnectionDetails.txt", value, (err) => {
+    if (err) console.log(err);
+    console.log("Successfully Written host mysql connection details  to File.", value);
+  });
+};
+
+const getStoredHostMySQLConnectionDetails = () => {
+  return new Promise((resolve, reject) => {
+    fs.readFile(
+      __dirname + "/hostMySQLConnectionDetails.txt",
+      "utf-8",
+      (err, data) => {
+        if (err || data.length == 0) {
+          reject(null);
+        }
+        // console.log("value retrieved back : ",data)
+        resolve(data);
+      }
+    );
+  });
+};
+
 module.exports = {
   storeHostId,
   getStoredHostId,
   storeHostUserName,
   getStoredHostUserName,
+  storeHostMySQLConnectionDetails,
+  getStoredHostMySQLConnectionDetails,
 };

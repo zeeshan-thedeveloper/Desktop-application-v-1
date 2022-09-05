@@ -5,7 +5,10 @@ const {
   storeHostUserName,
   getStoredHostUserName,
   getStoredHostId,
+  getStoredHostMySQLConnectionDetails,
+  storeHostMySQLConnectionDetails,
 } = require("./DeviceInfoManager/DeviceInfoManager");
+const { initConnection } = require("./MySQLConnector/MySQLConnector");
 const { sendRequestToCentralAPI } = require("./request-manager/requestManager");
 const {
   GET_UNIQUE_ID,
@@ -15,15 +18,38 @@ const {
 } = require("./request-manager/requestUrls");
 const CENTRAL_API = require("./request-manager/urls");
 
-let listOfServiceManagers=[];
+
+const mysqlSettingScreenAlertPlaceHolder = document.getElementById('mysqlSettingScreenAlertPlaceHolder')
+
+let listOfServiceManagers = [];
 
 $(document).ready(function () {
   // here we will hide the screens and check some important details.
   $("#dashboardScreen").hide();
+  //setting visibility of sub screens and connectivity of mysql
 
-  //setting visibility of sub screens
+  getStoredHostMySQLConnectionDetails().then((data)=>{
+
+    let values = data.split("|")
+      console.log("values",values)
+      initConnection(values[0],values[1],values[2],values[3]).then((success)=>{
+        $("#listOfServiceManagers_subScreen").show();
+        $("#mysqlSettings_subScreen").hide();
+        enableOrDisableAllDashboardOptions(false);
+      }).catch((error)=>{
+        $("#listOfServiceManagers_subScreen").hide();
+        $("#mysqlSettings_subScreen").show();
+        enableOrDisableAllDashboardOptions(true);
+      })
+   
+  }).catch((error)=>{
+    //disable all buttons .. except mysql setting .. and open mysql by default screen
+    $("#listOfServiceManagers_subScreen").hide();
+    $("#mysqlSettings_subScreen").show();
+    enableOrDisableAllDashboardOptions(true);
+  })
+
   $("#dashboardScreen").hide();
-
   $("#listOfServiceManagers_subScreen").show();
   $("#mysqlSettings_subScreen").hide();
   $("#manageDatabases_subScreen").hide();
@@ -31,7 +57,16 @@ $(document).ready(function () {
   $("#liveLogs_subScreen").hide();
 
   $("#loadingGifForListOfServicecManagers").hide();
+  
 });
+
+
+const enableOrDisableAllDashboardOptions=(value)=>{
+$('#listOfServiceManagers_btn').attr("disabled", value);
+$('#manageDatabases_btn').attr("disabled", value);
+$('#localServer_btn').attr("disabled", value);
+$('#liveLogs_btn').attr("disabled", value);
+}
 
 $("#continueBtn").click(() => {
   var userName = $("#userNameFld").val();
@@ -53,17 +88,8 @@ $("#continueBtn").click(() => {
 });
 
 //sub screen buttons.
-$("#my_table_1")
-  .find("#connectBtn")
-  .click(function () {
-    // console.log(this)
-    alert("hm");
-    // var id = $(this).closest("tr").find("td:eq(2)").text();
-    // alert(id)
-  });
 
 $("#listOfServiceManagers_btn").click(() => {
- 
   $("#listOfServiceManagers_subScreen").show(200);
   $("#mysqlSettings_subScreen").hide("slow", function () {});
   $("#manageDatabases_subScreen").hide("slow", function () {});
@@ -83,7 +109,7 @@ $("#listOfServiceManagers_btn").click(() => {
         .then((resp) => resp.json())
         .then((response) => {
           console.log("response", response);
-          listOfServiceManagers = response.responsePayload
+          listOfServiceManagers = response.responsePayload;
           response.responsePayload.forEach((manager, index) => {
             let tableRow = ` <tr style="margin-top: 8%">
     <th scope="row">${index + 1}</th>
@@ -116,14 +142,38 @@ $("#listOfServiceManagers_btn").click(() => {
     .catch((error) => {
       alert("Could not find host id");
     });
-
 });
+
 $("#mysqlSettings_btn").click(() => {
+
   $("#listOfServiceManagers_subScreen").hide("slow", function () {});
   $("#mysqlSettings_subScreen").show(200);
   $("#manageDatabases_subScreen").hide("slow", function () {});
   $("#localServer_subScreen").hide("slow", function () {});
   $("#liveLogs_subScreen").hide("slow", function () {});
+
+  //load details of connection from local file.. if found no file or no data then will set connection status accordingly.
+  getStoredHostMySQLConnectionDetails()
+    .then((data) => {
+      //lets make try to make connection using already stored data.
+      // console.log("Stored connection data", data);
+      let values = data.split("|")
+      console.log("values",values)
+      initConnection(values[0],values[1],values[2],values[3]).then((success)=>{
+        $("#mysqlConnectionStatus").text("Connected");
+        //set values.
+      $("#hostIp").val(values[0]);
+      $("#dbUserName").val(values[1]);
+      $("#dbUserPassword").val(values[2]);
+      $("#dbServerPort").val(values[3]);
+
+      }).catch((error)=>{
+        $("#mysqlConnectionStatus").text("Not connected");
+      })
+    })
+    .catch((error) => {
+      $("#mysqlConnectionStatus").text("Not Connected");
+    });
 });
 $("#manageDatabases_btn").click(() => {
   $("#listOfServiceManagers_subScreen").hide("slow", function () {});
@@ -147,61 +197,106 @@ $("#liveLogs_btn").click(() => {
   $("#liveLogs_subScreen").show(200);
 });
 
+$('#testMySQLCon_btn').click(()=>{
+  var hostIp = $("#hostIp").val();
+  var dbUserName = $("#dbUserName").val();
+  var dbUserPassword = $("#dbUserPassword").val();
+  var dbServerPort = $("#dbServerPort").val();
+  initConnection(hostIp,dbUserName,dbUserPassword,dbServerPort).then((success)=>{
+    $("#mysqlConnectionStatus").text("Connected");
+    alertForMySQLSettingScreen('Great..!! Connection created.', 'success');
+  }).catch((error)=>{
+    alertForMySQLSettingScreen('Umm... Could not make connections', 'warning');
+    // $("#mysqlConnectionStatus").text("Not connected, test failed");
+  })
+})
+
+$("#mySQLConForm").submit(function (event) {
+  event.preventDefault();
+  var hostIp = $("#hostIp").val();
+  var dbUserName = $("#dbUserName").val();
+  var dbUserPassword = $("#dbUserPassword").val();
+  var dbServerPort = $("#dbServerPort").val();
+  storeHostMySQLConnectionDetails(hostIp+"|"+dbUserName+"|"+dbUserPassword+"|"+dbServerPort);
+  initConnection(hostIp,dbUserName,dbUserPassword,dbServerPort).then((success)=>{
+    alertForMySQLSettingScreen('Great..!! Connection created.', 'success');
+    enableOrDisableAllDashboardOptions(false);
+  }).catch((failed)=>{
+    alertForMySQLSettingScreen('Umm... Could not make connections', 'warning');
+    enableOrDisableAllDashboardOptions(true);
+  })
+});
+
+//connection requests handlers
+
 const makeConnectionRequest = (index) => {
   let target = listOfServiceManagers[index];
   // alert("connect"+target.email);
-  getStoredHostId().then((hostId)=>{
-    getStoredHostUserName().then((hostName)=>{
-      $("#pleaseWaitModal_msg").text("Please wait we are connecting to admin")
+  getStoredHostId().then((hostId) => {
+    getStoredHostUserName().then((hostName) => {
+      $("#pleaseWaitModal_msg").text("Please wait we are connecting to admin");
       $("#pleaseWaitModal").modal("show");
-      sendRequestToCentralAPI("POST",ADD_HOST_IN_REQUEST_LIST,{
+      sendRequestToCentralAPI("POST", ADD_HOST_IN_REQUEST_LIST, {
         hostDeviceId: global.device_Id,
         adminId: target.id,
-        hostName:hostName+"@"+target.email, 
-        hostId:hostId, //which we got from server
-      }).then(async (success)=>{
-        const data = await success.json();
-        console.log(data);
-        
-        $("#pleaseWaitModal_msg").text(data.responseMessage)
-        // $("#infoModal").modal("show");
-        setTimeout(() => {
-          $("#pleaseWaitModal").modal("hide");
-        }, 3000);
-     
-      },(error)=>{  
-        alert(error)
-      })
-    })
-
-    
-  })
-  
+        hostName: hostName + "@" + target.email,
+        hostId: hostId, //which we got from server
+      }).then(
+        async (success) => {
+          const data = await success.json();
+          $("#pleaseWaitModal_msg").text(data.responseMessage);
+          setTimeout(() => {
+            $("#pleaseWaitModal").modal("hide");
+          }, 3000);
+        },
+        (error) => {
+          alert(error);
+        }
+      );
+    });
+  });
 };
 
 const makeDisConnectionRequest = (index) => {
   let target = listOfServiceManagers[index];
-  // alert("dis"+target.email);
 
-  getStoredHostId().then((hostId)=>{
-    $("#pleaseWaitModal_msg").text("Please wait we are dis connecting from admin")
+  getStoredHostId().then((hostId) => {
+    $("#pleaseWaitModal_msg").text(
+      "Please wait we are dis connecting from admin"
+    );
     $("#pleaseWaitModal").modal("show");
-    sendRequestToCentralAPI("POST",REMOVE_HOST_FROM_REQUEST_LIST,{
+    sendRequestToCentralAPI("POST", REMOVE_HOST_FROM_REQUEST_LIST, {
       adminId: target.id,
-      hostId:hostId, //which we got from server
-      status:"Decline"
-    }).then(async (success)=>{
-      const data = await success.json();
-      console.log(data);
-      $("#pleaseWaitModal_msg").text(data.responseMessage)
-      // $("#infoModal").modal("show");
-      setTimeout(() => {
-        $("#pleaseWaitModal").modal("hide");
-      }, 3000);
-   
-    },(error)=>{  
-      alert(error)
-    })
-  })
-  
+      hostId: hostId, //which we got from server
+      status: "Decline",
+    }).then(
+      async (success) => {
+        const data = await success.json();
+        console.log(data);
+        $("#pleaseWaitModal_msg").text(data.responseMessage);
+        setTimeout(() => {
+          $("#pleaseWaitModal").modal("hide");
+        }, 3000);
+      },
+      (error) => {
+        alert(error);
+      }
+    );
+  });
 };
+
+
+
+// Alerts
+
+const alertForMySQLSettingScreen = (message, type) => {
+  const wrapper = document.createElement('div')
+  wrapper.innerHTML = [
+    `<div class="alert alert-${type} alert-dismissible" role="alert">`,
+    `   <div>${message}</div>`,
+    '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
+    '</div>'
+  ].join('')
+
+  mysqlSettingScreenAlertPlaceHolder.append(wrapper)
+}

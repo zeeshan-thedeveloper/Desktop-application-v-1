@@ -66,7 +66,7 @@
       <div class="container">
         <div class="row">
           <div class="col-3" style="border-right: 1px solid black">
-            <div style="height: 500px">
+            <div style="height: 600px">
               <div
                 style="
                   border-bottom: 1px solid black;
@@ -92,7 +92,7 @@
                 <button
                   type="button"
                   style="width: 10rem"
-                  class="btn btn-outline-primary"
+                  class="btn btn-secondary"
                   id="listOfServiceManagers_btn"
                 >
                   Service Managers
@@ -103,7 +103,7 @@
                 <button
                   type="button"
                   style="width: 10rem"
-                  class="btn btn-outline-primary"
+                  class="btn btn-secondary"
                   id="mysqlSettings_btn"
                 >
                   MySQL Settings
@@ -114,7 +114,7 @@
                 <button
                   type="button"
                   style="width: 10rem"
-                  class="btn btn-outline-primary"
+                  class="btn btn-secondary"
                   id="manageDatabases_btn"
                 >
                   Manage Databases
@@ -125,7 +125,7 @@
                 <button
                   type="button"
                   style="width: 10rem"
-                  class="btn btn-outline-primary"
+                  class="btn btn-secondary"
                   id="localServer_btn"
                 >
                   Use Locally
@@ -136,7 +136,7 @@
                 <button
                   type="button"
                   style="width: 10rem"
-                  class="btn btn-outline-primary"
+                  class="btn btn-secondary"
                   id="liveLogs_btn"
                 >
                   Live Logs
@@ -145,31 +145,107 @@
             </div>
           </div>
           <div class="col-9">
-            <div id="listOfServiceManagers_subScreen" style="text-align: left;">
+            <div id="listOfServiceManagers_subScreen" style="text-align: left">
               <h4>List of Service Managers</h4>
-             
-              <table style="margin-top: 4%;" id="my_table_1" class="table">
+
+              <table style="margin-top: 4%" id="my_table_1" class="table">
                 <thead>
                   <tr>
                     <th scope="col">#</th>
                     <th scope="col">Email</th>
-                  
+
                     <th scope="col">Status</th>
-                    
-                    <th scope="col">
-                     action
-                    </th>
+
+                    <th scope="col">action</th>
                   </tr>
                 </thead>
-                
               </table>
-              <div id="loadingGifForListOfServicecManagers" style="text-align: center;">
-                <img src="./images/output-onlinegiftools.gif" width="100px" height="100px" />
+              <div
+                id="loadingGifForListOfServicecManagers"
+                style="text-align: center"
+              >
+                <img
+                  src="./images/output-onlinegiftools.gif"
+                  width="100px"
+                  height="100px"
+                />
               </div>
             </div>
 
-            <div id="mysqlSettings_subScreen">
-              <h5>MySQL Settings</h5>
+            <div id="mysqlSettings_subScreen" style="text-align: left;">
+              <div>
+                <h5>MySQL Settings</h5>
+                <p>Connect to your local mysql server. Make sure your mysql server is running.</p>
+                <p>Current MySQL Server status :<b> <label id="mysqlConnectionStatus"></label></b> </p>
+              </div>
+              <div style="padding-left: 5rem;padding-right: 5rem;padding-top: 1rem;">
+                <div id="mysqlSettingScreenAlertPlaceHolder"></div>
+                <form id="mySQLConForm">
+                  <div class="mb-3">
+                    <label for="hostIp" class="form-label"
+                      >Host IP</label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="hostIp"
+                      aria-describedby="emailHelp"
+                      placeholder="localhost"
+                    />
+                    <!-- <div id="emailHelp" class="form-text">
+                      We'll never share your email with anyone else.
+                    </div> -->
+                  </div>
+                  <div class="mb-3">
+                    <label for="dbUserName" class="form-label"
+                      >User Name</label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="dbUserName"
+                      aria-describedby="emailHelp"
+                      placeholder="root"
+                    />
+                    <!-- <div id="emailHelp" class="form-text">
+                      We'll never share your email with anyone else.
+                    </div> -->
+                  </div>
+                  <div class="mb-3">
+                    <label for="dbUserPassword" class="form-label"
+                      >Password</label
+                    >
+                    <input
+                      type="password"
+                      class="form-control"
+                      id="dbUserPassword"
+                      aria-describedby="emailHelp"
+                      
+                    />
+                    <!-- <div id="emailHelp" class="form-text">
+                      We'll never share your email with anyone else.
+                    </div> -->
+                  </div>
+                  <div class="mb-3">
+                    <label for="dbServerPort" class="form-label"
+                      >Port</label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="dbServerPort"
+                      aria-describedby="emailHelp"
+                      placeholder="3360"
+                    />
+                    <!-- <div id="emailHelp" class="form-text">
+                      We'll never share your email with anyone else.
+                    </div> -->
+                  </div>
+                  <button id="testMySQLCon_btn" type="button" class="btn btn-primary">Test Connection</button>
+                  <button id="saveMySQLCon_btn" type="submit" class="btn btn-secondary">Connect & Save</button>
+                
+                </form>
+              </div>
             </div>
 
             <div id="manageDatabases_subScreen">
@@ -190,36 +266,64 @@
 
     <!-- Modals -->
 
-    <div class="modal fade" id="pleaseWaitModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div
+      class="modal fade"
+      id="pleaseWaitModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="exampleModalCenterTitle"
+      aria-hidden="true"
+    >
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
-         
           <div class="modal-body">
             <div class="row">
               <div class="col-4">
-                <img src="./images/output-onlinegiftools.gif" width="100px" height="100px" />
+                <img
+                  src="./images/output-onlinegiftools.gif"
+                  width="100px"
+                  height="100px"
+                />
               </div>
-              <div class="col-8" style="font-size: 1.3rem ; padding-top: 5%;" id="pleaseWaitModal_msg">Please wait .. !! Loading the data</div>
+              <div
+                class="col-8"
+                style="font-size: 1.3rem; padding-top: 5%"
+                id="pleaseWaitModal_msg"
+              >
+                Please wait .. !! Loading the data
+              </div>
             </div>
           </div>
-          
         </div>
       </div>
     </div>
 
-    <div class="modal fade" id="infoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div
+      class="modal fade"
+      id="infoModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="exampleModalCenterTitle"
+      aria-hidden="true"
+    >
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
-         
           <div class="modal-body">
             <div class="row">
               <div class="col-4">
-                <img src="./images/Wavy_Tech-26_Single-07.jpg" width="100px" height="100px" />
+                <img
+                  src="./images/Wavy_Tech-26_Single-07.jpg"
+                  width="100px"
+                  height="100px"
+                />
               </div>
-              <div class="col-8" style="font-size: 1.3rem ; padding-top: 5%;" id="infoModal_msg"></div>
+              <div
+                class="col-8"
+                style="font-size: 1.3rem; padding-top: 5%"
+                id="infoModal_msg"
+              ></div>
             </div>
           </div>
-          
         </div>
       </div>
     </div>

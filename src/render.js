@@ -103,13 +103,14 @@ $("#listOfServiceManagers_btn").click(() => {
   //lets render data into it.
 
   $("#my_table_1").find("tr:gt(0)").remove();
-
-  getStoredHostId()
+  getStoredHostUserName().then((hostName)=>{
+    getStoredHostId()
     .then((hostId) => {
       $("#loadingGifForListOfServicecManagers").show();
       $("#noServiceProviderFound").hide();
       sendRequestToCentralAPI("POST", LOAD_SERVICE_PROVIDERS_LIST, {
         hostId: hostId,
+        hostName:hostName
       })
         .then((resp) => resp.json())
         .then((response) => {
@@ -120,7 +121,7 @@ $("#listOfServiceManagers_btn").click(() => {
     <th scope="row">${index + 1}</th>
     <td>${manager.email}</td>
     <td>${
-      manager.connectedHostList[0] != null ? "Connected" : "Not Connected"
+      manager.connectedHostList[0] != null ? manager.connectedHostList[0].isConnected : "Not Requested"
     }</td>
     <td>
       <button
@@ -129,12 +130,12 @@ $("#listOfServiceManagers_btn").click(() => {
         class="btn btn-outline-primary"
         id="connectBtn"
         onClick= ${
-          manager.connectedHostList[0] != null
+          manager.connectedHostList[0] != null 
             ? `makeDisConnectionRequest(${index})`
             : `makeConnectionRequest(${index})`
         }
       >
-      ${manager.connectedHostList[0] != null ? "Dis-Connect" : "Connect"}
+      ${manager.connectedHostList[0] != null ? (manager.connectedHostList[0].isConnected=="Pending"  || manager.connectedHostList[0].isConnected=="Dis-connect" ) ? 'Withdraw' : 'Dis-connect' : "Make Request"}
       </button>
     </td>
   </tr>`;
@@ -152,6 +153,10 @@ $("#listOfServiceManagers_btn").click(() => {
     .catch((error) => {
       alert("Could not find host id");
     });
+  }) .catch((error) => {
+    alert("Could not find host name");
+  });
+  
 });
 
 $("#mysqlSettings_btn").click(() => {
@@ -185,6 +190,7 @@ $("#mysqlSettings_btn").click(() => {
       $("#mysqlConnectionStatus").text("Not Connected");
     });
 });
+
 $("#manageDatabases_btn").click(() => {
   $("#listOfServiceManagers_subScreen").hide("slow", function () {});
   $("#mysqlSettings_subScreen").hide("slow", function () {});
@@ -192,6 +198,7 @@ $("#manageDatabases_btn").click(() => {
   $("#localServer_subScreen").hide("slow", function () {});
   $("#liveLogs_subScreen").hide("slow", function () {});
 });
+
 $("#localServer_btn").click(() => {
   $("#listOfServiceManagers_subScreen").hide("slow", function () {});
   $("#mysqlSettings_subScreen").hide("slow", function () {});

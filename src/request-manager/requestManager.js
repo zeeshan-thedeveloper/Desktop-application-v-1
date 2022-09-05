@@ -1,5 +1,5 @@
-const CENTRAL_API = "https://central-api-ldh.herokuapp.com";
-// const CENTRAL_API = "http://localhost:3003";
+// const CENTRAL_API = "https://central-api-ldh.herokuapp.com";
+const CENTRAL_API = "http://localhost:3003";
 // const CENTRAL_API = require("../request-manager/urls")
 
 const fetch = require("node-fetch");

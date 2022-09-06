@@ -10,7 +10,7 @@
       integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
       crossorigin="anonymous"
     />
-    
+
     <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script> -->
     <script
       src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"
@@ -28,12 +28,10 @@
       integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
       crossorigin="anonymous"
     ></script>
-  
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    
-
   </head>
   <body>
     <!-- Getting user name screen -->
@@ -42,12 +40,14 @@
         <img src="./images/IdeaRepresentative.png" width="400" height="400" />
       </div>
       <div>
-        <div style="font-size: 1.2rem; font-weight: bold">
-          Please provide user name
-        </div>
-        <div style="width: 50%; margin-left: 25%; margin-top: 2%">
-          <div class="input-group mb-3">
-            <input
+        
+        <div >
+          <div  id="continueBtnAndInputField">
+            <div style="font-size: 1.2rem; font-weight: bold;text-align: left;margin-left: 25%;">
+              Please provide user name
+            </div>
+            <div class="input-group mb-3" style="width: 50%; margin-left: 25%; margin-top: 2%">
+              <input
               type="text"
               id="userNameFld"
               class="form-control"
@@ -62,8 +62,36 @@
             >
               Continue
             </button>
+            </div>
+            
           </div>
-          <div id="errorMsg_nameSettingScreen"></div>
+          <div id="checkingUpLocalSqlServerConnection">
+            <div>
+              <img
+                src="./images/output-onlinegiftools.gif"
+                width="100px"
+                height="100px"
+              />
+            </div>
+            <div id="checkingSystemReq">
+              Please wait .. checking up you system..!!
+            </div>
+          </div>
+          <div id="errorMsg_nameSettingScreen">
+            <div>
+              Um ... we could not make connection to your local sql server...
+              Please make sure it running.
+            </div>
+            <div>
+              <button
+                class="btn btn-outline-secondary"
+                type="button"
+                id="checkNowBtn"
+              >
+                Check Now
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -91,7 +119,7 @@
                     alt="LDH"
                   />
                 </div>
-                <div style="font-size: 1rem; font-weight: bold;margin-top: 0%;">
+                <div style="font-size: 1rem; font-weight: bold; margin-top: 0%">
                   Welcome <br />
                   Zeeshan
                 </div>
@@ -157,30 +185,62 @@
             <div id="listOfServiceManagers_subScreen" style="text-align: left">
               <div>
                 <div class="row">
-                  <div class="col" style="text-align: right;">
-                    <div style="margin-top: 10%;">
-                      <h4 style=" font-size: 1.5rem; font-weight:bold ;letter-spacing: 4px;">Service</h4>
+                  <div class="col" style="text-align: right">
+                    <div style="margin-top: 10%">
+                      <h4
+                        style="
+                          font-size: 1.5rem;
+                          font-weight: bold;
+                          letter-spacing: 4px;
+                        "
+                      >
+                        Service
+                      </h4>
                     </div>
                   </div>
-                 
-                  <div class="col" style="text-align: left;">
-                    <div style="margin-top: 10%;">
-                      <h4 style=" font-size: 1.5rem; font-weight:bold ;letter-spacing: 4px;">Managers</h4>
+
+                  <div class="col" style="text-align: left">
+                    <div style="margin-top: 10%">
+                      <h4
+                        style="
+                          font-size: 1.5rem;
+                          font-weight: bold;
+                          letter-spacing: 4px;
+                        "
+                      >
+                        Managers
+                      </h4>
                     </div>
                   </div>
-                  <div class="col" style="text-align: left;">
-                    <img  src="./images/sammy-service-support.gif" width="100" height="100" />
+                  <div class="col" style="text-align: left">
+                    <img
+                      src="./images/sammy-service-support.gif"
+                      width="100"
+                      height="100"
+                    />
                   </div>
                 </div>
               </div>
-              <div style="position: relative;">
-                <div style="position: absolute; right:0px;">
-                  <button style="font-size: 1rem;" type="button" id="refreshListOfServiceManagers" class="btn btn-labeled btn-info">
-                  <span class="btn-label"><i class="glyphicon glyphicon-refresh"></i></span>Refresh</button>
+              <div style="position: relative">
+                <div style="position: absolute; right: 0px">
+                  <button
+                    style="font-size: 1rem"
+                    type="button"
+                    id="refreshListOfServiceManagers"
+                    class="btn btn-labeled btn-info"
+                  >
+                    <span class="btn-label"
+                      ><i class="glyphicon glyphicon-refresh"></i></span
+                    >Refresh
+                  </button>
                 </div>
               </div>
-              
-              <table style="margin-top: 3%;font-size: medium;" id="my_table_1" class="table">
+
+              <table
+                style="margin-top: 3%; font-size: medium"
+                id="my_table_1"
+                class="table"
+              >
                 <thead>
                   <tr>
                     <th scope="col">#</th>
@@ -190,68 +250,89 @@
 
                     <th scope="col">action</th>
                   </tr>
-
                 </thead>
-                
               </table>
               <div
-              id="loadingGifForListOfServicecManagers"
-              style="text-align: center"
-            >
-              <img
-                src="./images/output-onlinegiftools.gif"
-                width="100px"
-                height="100px"
-              />
-            </div>
-            
-            <div
-              id="noServiceProviderFound"
-              style="text-align: center"
-            >
-              <img
-                src="./images/no_data_found.jpg"
-                width="300px"
-                height="300px"
-              />
-              <div>
-                No Service Manager Found
+                id="loadingGifForListOfServicecManagers"
+                style="text-align: center"
+              >
+                <img
+                  src="./images/output-onlinegiftools.gif"
+                  width="100px"
+                  height="100px"
+                />
+              </div>
+
+              <div id="noServiceProviderFound" style="text-align: center">
+                <img
+                  src="./images/no_data_found.jpg"
+                  width="300px"
+                  height="300px"
+                />
+                <div>No Service Manager Found</div>
               </div>
             </div>
-            </div>
 
-            <div id="mysqlSettings_subScreen" style="text-align: left;">
-              <div style="border-bottom: 1px solid black;">
-
-                <div style="padding-left: 1rem;padding-right: 1rem;">
+            <div id="mysqlSettings_subScreen" style="text-align: left">
+              <div style="border-bottom: 1px solid black">
+                <div style="padding-left: 1rem; padding-right: 1rem">
                   <div class="row row-cols-2">
                     <div class="col">
-                      <div style="margin-top: 2%; text-align: left;">
-                        <div style="font-size: 1.5rem; letter-spacing: 5px; font-weight: bold;">MySQL Settings</div>
+                      <div style="margin-top: 2%; text-align: left">
+                        <div
+                          style="
+                            font-size: 1.5rem;
+                            letter-spacing: 5px;
+                            font-weight: bold;
+                          "
+                        >
+                          MySQL Settings
+                        </div>
                       </div>
-                      <p style="letter-spacing: 3px;font-size: 0.7rem;">Connect to your local mysql server. Make sure your mysql server is running.</p>
-                      <p style="text-decoration: underline; letter-spacing: 3px;font-weight: bold;font-size: 0.8rem; ">Current MySQL Server status :<b> <label style="background-color:rgb(200, 224, 62) ; letter-spacing: 1px;" id="mysqlConnectionStatus"></label></b> </p>
-      
+                      <p style="letter-spacing: 3px; font-size: 0.7rem">
+                        Connect to your local mysql server. Make sure your mysql
+                        server is running.
+                      </p>
+                      <p
+                        style="
+                          text-decoration: underline;
+                          letter-spacing: 3px;
+                          font-weight: bold;
+                          font-size: 0.8rem;
+                        "
+                      >
+                        Current MySQL Server status :<b>
+                          <label
+                            style="
+                              background-color: rgb(200, 224, 62);
+                              letter-spacing: 1px;
+                            "
+                            id="mysqlConnectionStatus"
+                          ></label
+                        ></b>
+                      </p>
                     </div>
-                    <div class="col" style="text-align: center;">
+                    <div class="col" style="text-align: center">
                       <img
-                      src="./images/sql.jpg"
-                      width="160px"
-                      height="160px"
-                    />
+                        src="./images/sql.jpg"
+                        width="160px"
+                        height="160px"
+                      />
                     </div>
-                   
                   </div>
                 </div>
-
               </div>
-              <div style="padding-left: 5rem;padding-right: 5rem;padding-top: 1rem;">
+              <div
+                style="
+                  padding-left: 5rem;
+                  padding-right: 5rem;
+                  padding-top: 1rem;
+                "
+              >
                 <div id="mysqlSettingScreenAlertPlaceHolder"></div>
                 <form id="mySQLConForm">
                   <div class="mb-3">
-                    <label for="hostIp" class="form-label"
-                      >Host IP</label
-                    >
+                    <label for="hostIp" class="form-label">Host IP</label>
                     <input
                       type="text"
                       class="form-control"
@@ -264,9 +345,7 @@
                     </div> -->
                   </div>
                   <div class="mb-3">
-                    <label for="dbUserName" class="form-label"
-                      >User Name</label
-                    >
+                    <label for="dbUserName" class="form-label">User Name</label>
                     <input
                       type="text"
                       class="form-control"
@@ -287,16 +366,13 @@
                       class="form-control"
                       id="dbUserPassword"
                       aria-describedby="emailHelp"
-                      
                     />
                     <!-- <div id="emailHelp" class="form-text">
                       We'll never share your email with anyone else.
                     </div> -->
                   </div>
                   <div class="mb-3">
-                    <label for="dbServerPort" class="form-label"
-                      >Port</label
-                    >
+                    <label for="dbServerPort" class="form-label">Port</label>
                     <input
                       type="text"
                       class="form-control"
@@ -308,36 +384,64 @@
                       We'll never share your email with anyone else.
                     </div> -->
                   </div>
-                  <button id="testMySQLCon_btn" type="button" class="btn btn-primary">Test Connection</button>
-                  <button id="saveMySQLCon_btn" type="submit" class="btn btn-secondary">Connect & Save</button>
+                  <button
+                    id="testMySQLCon_btn"
+                    type="button"
+                    class="btn btn-primary"
+                  >
+                    Test Connection
+                  </button>
+                  <button
+                    id="saveMySQLCon_btn"
+                    type="submit"
+                    class="btn btn-secondary"
+                  >
+                    Connect & Save
+                  </button>
                 </form>
               </div>
             </div>
 
             <div id="manageDatabases_subScreen">
-              <div >
-                <div class="row row-cols-2;" style="text-align: left;margin-top: 5%;">
-                  <div class="col" style="text-align: left;">
-                    <div style="font-size: 1.4rem;letter-spacing: 5px ;font-weight: bold;margin-top: 2%; padding-left: 0rem;">Manage Databases</div>
-                    <p style="letter-spacing: 3px;font-size: 0.8rem;">Allow or restrict to share your databases</p>
-                   
+              <div>
+                <div
+                  class="row row-cols-2;"
+                  style="text-align: left; margin-top: 5%"
+                >
+                  <div class="col" style="text-align: left">
+                    <div
+                      style="
+                        font-size: 1.4rem;
+                        letter-spacing: 5px;
+                        font-weight: bold;
+                        margin-top: 2%;
+                        padding-left: 0rem;
+                      "
+                    >
+                      Manage Databases
+                    </div>
+                    <p style="letter-spacing: 3px; font-size: 0.8rem">
+                      Allow or restrict to share your databases
+                    </p>
                   </div>
-                  <div class="col" style="text-align: center;">
+                  <div class="col" style="text-align: center">
                     <div>
                       <img
-                      src="./images/icons8-database-administrator-64.png"
-                      width="70px"
-                      height="70px"
-                    />
+                        src="./images/icons8-database-administrator-64.png"
+                        width="70px"
+                        height="70px"
+                      />
                     </div>
                   </div>
-                  
                 </div>
               </div>
-             
-                
-              <div style="margin-top: 0%;">
-                <table  style="overflow-y: scroll;margin-top: 0%; font-size: medium;" id="listOfAllDatabases"  class="table">
+
+              <div style="margin-top: 0%">
+                <table
+                  style="overflow-y: scroll; margin-top: 0%; font-size: medium"
+                  id="listOfAllDatabases"
+                  class="table"
+                >
                   <thead>
                     <tr>
                       <th scope="col">#</th>
@@ -355,25 +459,34 @@
             </div>
 
             <div id="liveLogs_subScreen">
-              
               <div>
                 <div class="row row-cols-2">
-                  <div class="col" style="text-align: left;">
-                    <div style="font-size: 1.5rem;letter-spacing: 7px ;font-weight: bold;margin-top: 2%;">Live requests logs</div>
-                    <p style="letter-spacing: 3px;font-size: 0.8rem;">Monitor incoming requests</p>
+                  <div class="col" style="text-align: left">
+                    <div
+                      style="
+                        font-size: 1.5rem;
+                        letter-spacing: 7px;
+                        font-weight: bold;
+                        margin-top: 2%;
+                      "
+                    >
+                      Live requests logs
+                    </div>
+                    <p style="letter-spacing: 3px; font-size: 0.8rem">
+                      Monitor incoming requests
+                    </p>
                   </div>
                   <div class="col">
-                    <img
-                    src="./images/logs.jpg"
-                    width="100px"
-                    height="100px"
-                  />
+                    <img src="./images/logs.jpg" width="100px" height="100px" />
                   </div>
-                 
                 </div>
               </div>
-              <div style="overflow: scroll; height: 490px;">
-                <table  style="overflow-y: scroll;;margin-top: 0%;" id="liveLogTable"  class="table table-striped table-bordered ">
+              <div style="overflow: scroll; height: 490px">
+                <table
+                  style="overflow-y: scroll; margin-top: 0%"
+                  id="liveLogTable"
+                  class="table table-striped table-bordered"
+                >
                   <thead>
                     <tr>
                       <th scope="col">#</th>
@@ -391,6 +504,15 @@
       </div>
     </div>
 
+    <div id="internalServerErrorScreen">
+      <div>
+        <img
+        src="./images/internal_server_error.jpg"
+        width="100px"
+        height="100px"
+        />
+      </div>
+    </div>
     <!-- Modals -->
 
     <div
@@ -414,7 +536,7 @@
               </div>
               <div
                 class="col-8"
-                style="font-size: 1.3rem; padding-top: 5%"
+                style="font-size: 0.9rem; padding-top: 5%"
                 id="pleaseWaitModal_msg"
               >
                 Please wait .. !! Loading the data
@@ -446,7 +568,7 @@
               </div>
               <div
                 class="col-8"
-                style="font-size: 1.3rem; padding-top: 5%"
+                style="font-size: 0.9rem; padding-top: 5%"
                 id="infoModal_msg"
               ></div>
             </div>

@@ -35,43 +35,102 @@ let listOfServiceManagers = [];
 $(document).ready(function () {
   // here we will hide the screens and check some important details.
   $("#dashboardScreen").hide();
-  //setting visibility of sub screens and connectivity of mysql
-
-  getStoredHostMySQLConnectionDetails()
-    .then((data) => {
-      let values = data.split("|");
-      console.log("values", values);
-      initConnection(values[0], values[1], values[2], values[3])
-        .then((success) => {
-          $("#listOfServiceManagers_subScreen").show();
-          $("#mysqlSettings_subScreen").hide();
-          enableOrDisableAllDashboardOptions(false);
-
-          updateDeviceId();
-        })
-        .catch((error) => {
-          $("#listOfServiceManagers_subScreen").hide();
-          $("#mysqlSettings_subScreen").show();
-          enableOrDisableAllDashboardOptions(true);
-          alertForMySQLSettingScreen(
-            "Error :" + JSON.stringify(error),
-            "warning"
-          );
-        });
-    })
-    .catch((error) => {
-      //disable all buttons .. except mysql setting .. and open mysql by default screen
-      $("#listOfServiceManagers_subScreen").hide();
-      $("#mysqlSettings_subScreen").show();
-      enableOrDisableAllDashboardOptions(true);
-    });
-
-  $("#dashboardScreen").hide();
-  // $("#listOfServiceManagers_subScreen").show();
-  // $("#mysqlSettings_subScreen").hide();
   $("#manageDatabases_subScreen").hide();
   $("#localServer_subScreen").hide();
   $("#liveLogs_subScreen").hide();
+  $("#internalServerErrorScreen").hide();
+
+  //setting visibility of sub screens and connectivity of mysql
+  getStoredHostUserName()
+    .then((hostName) => {
+      //already stored host name
+
+      getStoredHostMySQLConnectionDetails()
+        .then((data) => {
+          $("#checkingUpLocalSqlServerConnection").show();
+          $("#continueBtnAndInputField").hide();
+          $("#errorMsg_nameSettingScreen").hide();
+          let values = data.split("|");
+          console.log("values", values);
+          $("#checkingSystemReq").text("Checking up sql server");
+          initConnection(values[0], values[1], values[2], values[3])
+            .then((success) => {
+              $("#listOfServiceManagers_subScreen").show();
+              $("#mysqlSettings_subScreen").hide();
+
+              enableOrDisableAllDashboardOptions(false);
+              updateDeviceId();
+              //connection is created...
+              setTimeout(() => {
+                $("#checkingSystemReq").text("Make test connection");
+              }, 2000);
+              setTimeout(() => {
+                $("#checkingSystemReq").text("Connection Successful");
+              }, 4000);
+              setTimeout(() => {
+                $("#checkingSystemReq").text(
+                  "Redirecting to dashboard please wait."
+                );
+              }, 6000);
+              setTimeout(() => {
+                // $("#continueBtn").trigger("click");
+                $("#checkingUpLocalSqlServerConnection").hide();
+                $("#continueBtnAndInputField").hide();
+                $("#nameSettingScreen").hide();
+                $("#errorMsg_nameSettingScreen").hide();
+                $("#dashboardScreen").show(200);
+              }, 8000);
+            })
+            .catch((error) => {
+              $("#listOfServiceManagers_subScreen").hide();
+              $("#mysqlSettings_subScreen").show();
+              enableOrDisableAllDashboardOptions(true);
+              alertForMySQLSettingScreen(
+                "Error :" + JSON.stringify(error),
+                "warning"
+              );
+              //redirect to .. show up the message the could not create connection with sql server...
+              $("#errorMsg_nameSettingScreen").show();
+            });
+        })
+        .catch((error) => {
+          //disable all buttons .. except mysql setting .. and open mysql by default screen
+          $("#listOfServiceManagers_subScreen").hide();
+          $("#mysqlSettings_subScreen").show();
+          $("#continueBtnAndInputField").hide();
+          $("#errorMsg_nameSettingScreen").hide();
+          enableOrDisableAllDashboardOptions(true);
+          updateDeviceId();
+          //connection is created...
+          setTimeout(() => {
+            $("#checkingSystemReq").text("Making test connection");
+          }, 2000);
+          setTimeout(() => {
+            $("#checkingSystemReq").text(
+              "No credentials for making connection found.. Please store from dashboard and make connection"
+            );
+          }, 4000);
+          setTimeout(() => {
+            // $("#checkingSystemReq").text(
+            //   "Redirecting to dashboard please wait."
+            // );
+          }, 6000);
+          setTimeout(() => {
+            // $("#continueBtn").trigger("click");
+            $("#checkingUpLocalSqlServerConnection").hide();
+            $("#continueBtnAndInputField").hide();
+            $("#nameSettingScreen").hide();
+            $("#dashboardScreen").show(200);
+          }, 8000);
+        });
+    })
+    .catch((error) => {
+      //no stored host name
+      $("#checkingUpLocalSqlServerConnection").hide();
+      $("#continueBtnAndInputField").show();
+      $("#errorMsg_nameSettingScreen").hide();
+      //name will be taken from user
+    });
 
   $("#loadingGifForListOfServicecManagers").hide();
   $("#noServiceProviderFound").hide();
@@ -86,25 +145,101 @@ const enableOrDisableAllDashboardOptions = (value) => {
 
 $("#continueBtn").click(() => {
   var userName = $("#userNameFld").val();
-  getStoredHostUserName()
-    .then((userName) => {
-      $("#nameSettingScreen").hide("slow", function () {
-        // hide with callback function
-        // $("#dashboardScreen").show(200);
-        console.log("nameSettingScreen is hidden");
-        $("#dashboardScreen").show(200);
-      });
+
+  getStoredHostMySQLConnectionDetails()
+    .then((data) => {
+      $("#checkingUpLocalSqlServerConnection").hide();
+      $("#continueBtnAndInputField").hide();
+      $("#nameSettingScreen").hide();
+      $("#errorMsg_nameSettingScreen").hide();
+
+      let values = data.split("|");
+      console.log("values", values);
+      $("#checkingSystemReq").text("Checking up sql server");
+      initConnection(values[0], values[1], values[2], values[3])
+        .then((success) => {
+          $("#listOfServiceManagers_subScreen").show();
+          $("#mysqlSettings_subScreen").hide();
+
+          enableOrDisableAllDashboardOptions(false);
+          updateDeviceId();
+          //connection is created...
+          setTimeout(() => {
+            $("#checkingSystemReq").text("Make test connection");
+          }, 2000);
+          setTimeout(() => {
+            $("#checkingSystemReq").text("Connection Successful");
+          }, 4000);
+          setTimeout(() => {
+            $("#checkingSystemReq").text(
+              "Redirecting to dashboard please wait."
+            );
+          }, 6000);
+          setTimeout(() => {
+            $("#checkingUpLocalSqlServerConnection").hide();
+            $("#continueBtnAndInputField").hide();
+            $("#nameSettingScreen").hide();
+            $("#errorMsg_nameSettingScreen").hide();
+            getStoredHostUserName()
+              .then((userName) => {
+                $("#nameSettingScreen").hide("slow", function () {
+                  // hide with callback function
+                  // $("#dashboardScreen").show(200);
+                  console.log("nameSettingScreen is hidden");
+                  $("#dashboardScreen").show(200);
+                });
+              })
+              .catch((error) => {
+                storeHostUserName(userName);
+                $("#nameSettingScreen").hide("slow", function () {
+                  $("#dashboardScreen").show(200);
+                });
+              });
+          }, 8000);
+        })
+        .catch((error) => {
+          $("#listOfServiceManagers_subScreen").hide();
+          $("#mysqlSettings_subScreen").show();
+
+          enableOrDisableAllDashboardOptions(true);
+          alertForMySQLSettingScreen(
+            "Error :" + JSON.stringify(error),
+            "warning"
+          );
+          //redirect to .. show up the message the could not create connection with sql server...
+          $("#checkingUpLocalSqlServerConnection").hide();
+          $("#errorMsg_nameSettingScreen").show();
+        });
     })
     .catch((error) => {
-      storeHostUserName(userName);
-      $("#nameSettingScreen").hide("slow", function () {
-        $("#dashboardScreen").show(200);
-      });
+      //disable all buttons .. except mysql setting .. and open mysql by default screen
+      $("#listOfServiceManagers_subScreen").hide();
+      $("#mysqlSettings_subScreen").show();
+
+      enableOrDisableAllDashboardOptions(true);
+
+      getStoredHostUserName()
+        .then((userName) => {
+          $("#nameSettingScreen").hide("slow", function () {
+            // hide with callback function
+            // $("#dashboardScreen").show(200);
+            console.log("nameSettingScreen is hidden");
+            $("#dashboardScreen").show(200);
+          });
+        })
+        .catch((error) => {
+          storeHostUserName(userName);
+          $("#nameSettingScreen").hide("slow", function () {
+            $("#dashboardScreen").show(200);
+          });
+        });
     });
 });
 
 //sub screen buttons.
-$("#refreshListOfServiceManagers").click(()=>{$("#listOfServiceManagers_btn").trigger('click')})
+$("#refreshListOfServiceManagers").click(() => {
+  $("#listOfServiceManagers_btn").trigger("click");
+});
 $("#listOfServiceManagers_btn").click(() => {
   $("#listOfServiceManagers_subScreen").show(200);
   $("#mysqlSettings_subScreen").hide("slow", function () {});
@@ -170,8 +305,6 @@ $("#listOfServiceManagers_btn").click(() => {
                 $("#noServiceProviderFound").show();
               }
             });
-
-            
         })
         .catch((error) => {
           alert("Could not find host id");
@@ -214,10 +347,9 @@ $("#mysqlSettings_btn").click(() => {
     });
 });
 
-let dataToPopulate=[];
+let dataToPopulate = [];
 
 $("#manageDatabases_btn").click(() => {
-
   $("#listOfServiceManagers_subScreen").hide("slow", function () {});
   $("#mysqlSettings_subScreen").hide("slow", function () {});
   $("#manageDatabases_subScreen").show(200);
@@ -251,67 +383,64 @@ $("#manageDatabases_btn").click(() => {
           .then((databasePermissions) => {
             let dbPermissions = JSON.parse(databasePermissions);
             console.log(dbPermissions);
-            dataToPopulate=[];
+            dataToPopulate = [];
             $("#listOfAllDatabases").find("tr:gt(0)").remove();
-            targetDbs.forEach((dbName,index) => {
-             
-              let status=false;
-              let isFound=false;
+            targetDbs.forEach((dbName, index) => {
+              let status = false;
+              let isFound = false;
 
-              dbPermissions.forEach((storedDb)=>{
-                if(storedDb.dbName==dbName){
-                  status=storedDb.isAllowedToUse;
-                  isFound=true;
+              dbPermissions.forEach((storedDb) => {
+                if (storedDb.dbName == dbName) {
+                  status = storedDb.isAllowedToUse;
+                  isFound = true;
                 }
-              })
+              });
 
-              if(isFound){
+              if (isFound) {
                 dataToPopulate.push({
-                  dbName:dbName,
-                  isAllowedToUse:status
-                })
-              }else{
+                  dbName: dbName,
+                  isAllowedToUse: status,
+                });
+              } else {
                 dataToPopulate.push({
-                  dbName:dbName,
-                  isAllowedToUse:false
-                })
+                  dbName: dbName,
+                  isAllowedToUse: false,
+                });
               }
-            })
-            console.log("dataToPopulate",dataToPopulate)
-            dataToPopulate.forEach((item,index)=>{
-
+            });
+            console.log("dataToPopulate", dataToPopulate);
+            dataToPopulate.forEach((item, index) => {
               let tableRow = ` <tr style="margin-top: 8%">
               <th scope="row">${index + 1}</th>
               <td>${item.dbName}</td>
-              <td>${item.isAllowedToUse===true?"Yes":"No"}</td>
+              <td>${item.isAllowedToUse === true ? "Yes" : "No"}</td>
               <td>
               <button
               type="button"
               style="width: 8rem"
               class="btn btn-outline-primary"
               id="connectBtn"
-              onClick = ${item.isAllowedToUse==true ? `setDisableSharingOfDb(${index})` : `setEnableSharingOfDb(${index})`} 
+              onClick = ${
+                item.isAllowedToUse == true
+                  ? `setDisableSharingOfDb(${index})`
+                  : `setEnableSharingOfDb(${index})`
+              } 
             >
-            ${
-              item.isAllowedToUse==true
-                ?  "Restrict" : "Allow"
-            }
+            ${item.isAllowedToUse == true ? "Restrict" : "Allow"}
             </button>
               </td>
               </tr>`;
 
-            $("#listOfAllDatabases").append(tableRow);
-
-            })
-
+              $("#listOfAllDatabases").append(tableRow);
+            });
           })
 
           .catch((error) => {
             //there was not data or no file .. so in this case will write it.
             let dbPermissions = [];
             $("#listOfAllDatabases").find("tr:gt(0)").remove();
-            targetDbs.forEach((dbName,index) => {
-            let tableRow = ` <tr style="margin-top: 8%">
+            targetDbs.forEach((dbName, index) => {
+              let tableRow = ` <tr style="margin-top: 8%">
             <th scope="row">${index + 1}</th>
             <td>${dbName}</td>
             <td>${"No"}</td>
@@ -328,7 +457,7 @@ $("#manageDatabases_btn").click(() => {
           </button>
             </td>
             </tr>`;
-            $("#listOfAllDatabases").append(tableRow);
+              $("#listOfAllDatabases").append(tableRow);
 
               dbPermissions.push({
                 dbName: dbName,
@@ -345,19 +474,19 @@ $("#manageDatabases_btn").click(() => {
     });
 });
 
-const setEnableSharingOfDb=(index)=>{
-    let target = dataToPopulate[index];
-    dataToPopulate[index].isAllowedToUse=true;
-    storeDatabasePermissions(JSON.stringify(dataToPopulate))
-    $("#manageDatabases_btn").trigger("click")
-}
-
-const setDisableSharingOfDb=(index)=>{
+const setEnableSharingOfDb = (index) => {
   let target = dataToPopulate[index];
-  dataToPopulate[index].isAllowedToUse=false;
-  storeDatabasePermissions(JSON.stringify(dataToPopulate))
-  $("#manageDatabases_btn").trigger("click")
-}
+  dataToPopulate[index].isAllowedToUse = true;
+  storeDatabasePermissions(JSON.stringify(dataToPopulate));
+  $("#manageDatabases_btn").trigger("click");
+};
+
+const setDisableSharingOfDb = (index) => {
+  let target = dataToPopulate[index];
+  dataToPopulate[index].isAllowedToUse = false;
+  storeDatabasePermissions(JSON.stringify(dataToPopulate));
+  $("#manageDatabases_btn").trigger("click");
+};
 
 $("#localServer_btn").click(() => {
   $("#listOfServiceManagers_subScreen").hide("slow", function () {});

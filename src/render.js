@@ -104,7 +104,7 @@ $("#continueBtn").click(() => {
 });
 
 //sub screen buttons.
-
+$("#refreshListOfServiceManagers").click(()=>{$("#listOfServiceManagers_btn").trigger('click')})
 $("#listOfServiceManagers_btn").click(() => {
   $("#listOfServiceManagers_subScreen").show(200);
   $("#mysqlSettings_subScreen").hide("slow", function () {});
@@ -170,6 +170,8 @@ $("#listOfServiceManagers_btn").click(() => {
                 $("#noServiceProviderFound").show();
               }
             });
+
+            
         })
         .catch((error) => {
           alert("Could not find host id");
@@ -215,6 +217,7 @@ $("#mysqlSettings_btn").click(() => {
 let dataToPopulate=[];
 
 $("#manageDatabases_btn").click(() => {
+
   $("#listOfServiceManagers_subScreen").hide("slow", function () {});
   $("#mysqlSettings_subScreen").hide("slow", function () {});
   $("#manageDatabases_subScreen").show(200);
@@ -230,6 +233,7 @@ $("#manageDatabases_btn").click(() => {
     "sys",
     "world",
   ];
+
   getMySQLConnection()
     .then((connection) => {
       connection.query("Show databases", function (err, result) {
@@ -344,12 +348,14 @@ const setEnableSharingOfDb=(index)=>{
     let target = dataToPopulate[index];
     dataToPopulate[index].isAllowedToUse=true;
     storeDatabasePermissions(JSON.stringify(dataToPopulate))
+    $("#manageDatabases_btn").trigger("click")
 }
 
 const setDisableSharingOfDb=(index)=>{
   let target = dataToPopulate[index];
   dataToPopulate[index].isAllowedToUse=false;
   storeDatabasePermissions(JSON.stringify(dataToPopulate))
+  $("#manageDatabases_btn").trigger("click")
 }
 
 $("#localServer_btn").click(() => {
@@ -380,6 +386,7 @@ $("#testMySQLCon_btn").click(() => {
     .catch((error) => {
       alertForMySQLSettingScreen("Error :" + JSON.stringify(error), "warning");
       // $("#mysqlConnectionStatus").text("Not connected, test failed");
+      $("#mysqlConnectionStatus").text("Disconnected");
     });
 });
 
@@ -396,10 +403,12 @@ $("#mySQLConForm").submit(function (event) {
     .then((success) => {
       alertForMySQLSettingScreen("Great..!! Connection created.", "success");
       enableOrDisableAllDashboardOptions(false);
+      $("#mysqlConnectionStatus").text("Connected");
     })
     .catch((error) => {
       alertForMySQLSettingScreen("Error :" + JSON.stringify(error), "warning");
       enableOrDisableAllDashboardOptions(true);
+      $("#mysqlConnectionStatus").text("Disconnected");
     });
 });
 

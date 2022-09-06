@@ -141,7 +141,7 @@ $("#listOfServiceManagers_btn").click(() => {
     <td>
       <button
         type="button"
-        style="width: 8rem"
+        style="width: 8rem;height:2.3rem;font-size:0.8rem"
         class="btn btn-outline-primary"
         id="connectBtn"
         onClick= ${
@@ -294,7 +294,7 @@ $("#manageDatabases_btn").click(() => {
             >
             ${
               item.isAllowedToUse==true
-                ?  "Dis-Allow" : "Allow"
+                ?  "Restrict" : "Allow"
             }
             </button>
               </td>
@@ -318,7 +318,8 @@ $("#manageDatabases_btn").click(() => {
             <td>
             <button
             type="button"
-            style="width: 8rem"
+            style="width: 5rem;"
+            
             class="btn btn-outline-primary"
             id="allowBtn"
             onClick =setEnableSharingOfDb(${index})

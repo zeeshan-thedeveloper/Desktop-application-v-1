@@ -259,13 +259,24 @@
                   </div>
                   <button id="testMySQLCon_btn" type="button" class="btn btn-primary">Test Connection</button>
                   <button id="saveMySQLCon_btn" type="submit" class="btn btn-secondary">Connect & Save</button>
-                
                 </form>
               </div>
             </div>
 
             <div id="manageDatabases_subScreen">
               <h5>Manage Databases</h5>
+              <div>
+                <table  style="overflow-y: scroll;margin-top: 4%;" id="listOfAllDatabases"  class="table">
+                  <thead>
+                    <tr>
+                      <th scope="col">#</th>
+                      <th scope="col">Database Name</th>
+                      <th scope="col">Is allowed to use?</th>
+                      <th scope="col">Action</th>
+                    </tr>
+                  </thead>
+                </table>
+              </div>
             </div>
 
             <div id="localServer_subScreen">
@@ -274,6 +285,19 @@
 
             <div id="liveLogs_subScreen">
               <h5>Live Logs</h5>
+              <div>
+                <table  style="height: 600px;overflow: scroll;margin-top: 4%;" id="liveLogTable"  class="table">
+                  <thead>
+                    <tr>
+                      <th scope="col">#</th>
+                      <th scope="col">Target Database</th>
+                      <th scope="col">Query</th>
+                      <th scope="col">Request time</th>
+                      <th scope="col">Request response</th>
+                    </tr>
+                  </thead>
+                </table>
+              </div>
             </div>
           </div>
         </div>

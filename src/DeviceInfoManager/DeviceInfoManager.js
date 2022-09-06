@@ -41,7 +41,10 @@ const getStoredHostUserName = () => {
 const storeHostMySQLConnectionDetails = (value) => {
   fs.writeFile(__dirname + "/hostMySQLConnectionDetails.txt", value, (err) => {
     if (err) console.log(err);
-    console.log("Successfully Written host mysql connection details  to File.", value);
+    console.log(
+      "Successfully Written host mysql connection details  to File.",
+      value
+    );
   });
 };
 
@@ -61,6 +64,29 @@ const getStoredHostMySQLConnectionDetails = () => {
   });
 };
 
+const storeDatabasePermissions = (value) => {
+  fs.writeFile(__dirname + "/DatabasePermissions.json", value, (err) => {
+    if (err) console.log(err);
+    console.log("Successfully Written database permissions  to File.", value);
+  });
+};
+
+const getStoredDatabasePermissions = () => {
+  return new Promise((resolve, reject) => {
+    fs.readFile(
+      __dirname + "/DatabasePermissions.json",
+      "utf-8",
+      (err, data) => {
+        if (err || data.length == 0) {
+          reject(null);
+        }
+        // console.log("value retrieved back : ",data)
+        resolve(data);
+      }
+    );
+  });
+};
+
 module.exports = {
   storeHostId,
   getStoredHostId,
@@ -68,4 +94,6 @@ module.exports = {
   getStoredHostUserName,
   storeHostMySQLConnectionDetails,
   getStoredHostMySQLConnectionDetails,
+  storeDatabasePermissions,
+  getStoredDatabasePermissions,
 };

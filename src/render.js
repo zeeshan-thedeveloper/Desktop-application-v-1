@@ -44,7 +44,7 @@ $(document).ready(function () {
   getStoredHostUserName()
     .then((hostName) => {
       //already stored host name
-
+     
       getStoredHostMySQLConnectionDetails()
         .then((data) => {
           $("#checkingUpLocalSqlServerConnection").show();
@@ -145,7 +145,7 @@ const enableOrDisableAllDashboardOptions = (value) => {
 
 $("#continueBtn").click(() => {
   var userName = $("#userNameFld").val();
-
+  $("hostName").text(userName)
   getStoredHostMySQLConnectionDetails()
     .then((data) => {
       $("#checkingUpLocalSqlServerConnection").hide();

@@ -33,18 +33,22 @@ const mysqlSettingScreenAlertPlaceHolder = document.getElementById(
 let listOfServiceManagers = [];
 
 $(document).ready(function () {
+  setUp();
+})
+const setUp=()=>{
+  if(navigator.onLine){
   // here we will hide the screens and check some important details.
   $("#dashboardScreen").hide();
   $("#manageDatabases_subScreen").hide();
   $("#localServer_subScreen").hide();
   $("#liveLogs_subScreen").hide();
   $("#internalServerErrorScreen").hide();
-
+  $("#checkingUpLocalSqlServerConnection").show();
+  $("#nameSettingScreen").show();
   //setting visibility of sub screens and connectivity of mysql
   getStoredHostUserName()
     .then((hostName) => {
       //already stored host name
-     
       getStoredHostMySQLConnectionDetails()
         .then((data) => {
           $("#checkingUpLocalSqlServerConnection").show();
@@ -134,7 +138,11 @@ $(document).ready(function () {
 
   $("#loadingGifForListOfServicecManagers").hide();
   $("#noServiceProviderFound").hide();
-});
+
+  }else{
+    showInternetConnectionErrorScreen();
+  }
+};
 
 const enableOrDisableAllDashboardOptions = (value) => {
   $("#listOfServiceManagers_btn").attr("disabled", value);
@@ -265,6 +273,8 @@ $("#listOfServiceManagers_btn").click(() => {
               console.log("response", response);
               listOfServiceManagers = response.responsePayload;
               response.responsePayload.forEach((manager, index) => {
+                manager.connectedHostList=manager.connectedHostList.filter(x => x !== null)
+                
                 let tableRow = ` <tr style="margin-top: 8%">
     <th scope="row">${index + 1}</th>
     <td>${manager.email}</td>
@@ -620,3 +630,25 @@ const updateDeviceId = () => {
     emitter.emit(Events.UPDATE_DEVICE_ID);
   }, 60000);
 };
+
+
+const showInternetConnectionErrorScreen=()=>{
+  $("#dashboardScreen").hide();
+  $("#internalServerErrorScreen").show();
+  $("#continueBtnAndInputField").hide();
+  $("#errorMsg_nameSettingScreen").hide();
+  $("#continueBtnAndInputField").hide();
+  $("#checkingUpLocalSqlServerConnection").hide();
+  $("#nameSettingScreen").hide();
+}
+
+
+window.addEventListener("offline", (event) => {
+  showInternetConnectionErrorScreen();
+})
+
+
+window.addEventListener("online", (event) => {
+  console.log("online now")
+  setUp(); 
+})

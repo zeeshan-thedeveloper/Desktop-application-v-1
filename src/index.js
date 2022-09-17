@@ -19,8 +19,8 @@ const createWindow = () => {
       contextIsolation: false,
       enableRemoteModule: true,
     },
-    maximizable: false,
-    resizable: false,
+    maximizable: true,
+    resizable: true,
     autoHideMenuBar: true,
   });
 

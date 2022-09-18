@@ -9,6 +9,8 @@ const {
   storeHostMySQLConnectionDetails,
   getStoredDatabasePermissions,
   storeDatabasePermissions,
+  storeServiceManagerEmailAddress,
+  getStoredServiceManagerEmailAddress,
 } = require("./DeviceInfoManager/DeviceInfoManager");
 
 const Events = require("./event-engine/Events");
@@ -23,6 +25,7 @@ const {
   LOAD_SERVICE_PROVIDERS_LIST,
   ADD_HOST_IN_REQUEST_LIST,
   REMOVE_HOST_FROM_REQUEST_LIST,
+  IS_HOST_CONNECTED,
 } = require("./request-manager/requestUrls");
 const CENTRAL_API = require("./request-manager/urls");
 
@@ -35,6 +38,7 @@ let listOfServiceManagers = [];
 $(document).ready(function () {
   setUp();
 })
+
 const setUp=()=>{
   if(navigator.onLine){
   // here we will hide the screens and check some important details.
@@ -49,7 +53,9 @@ const setUp=()=>{
   getStoredHostUserName()
     .then((hostName) => {
       //already stored host name
+      $("#hostName").text("Host Name : "+hostName)
       getStoredHostMySQLConnectionDetails()
+
         .then((data) => {
           $("#checkingUpLocalSqlServerConnection").show();
           $("#continueBtnAndInputField").hide();
@@ -82,6 +88,7 @@ const setUp=()=>{
                 $("#continueBtnAndInputField").hide();
                 $("#nameSettingScreen").hide();
                 $("#errorMsg_nameSettingScreen").hide();
+                $("#listOfServiceManagers_btn").trigger("click");
                 $("#dashboardScreen").show(200);
               }, 8000);
             })
@@ -124,6 +131,7 @@ const setUp=()=>{
             $("#checkingUpLocalSqlServerConnection").hide();
             $("#continueBtnAndInputField").hide();
             $("#nameSettingScreen").hide();
+            $("#listOfServiceManagers_btn").trigger("click");
             $("#dashboardScreen").show(200);
           }, 8000);
         });
@@ -150,6 +158,10 @@ const enableOrDisableAllDashboardOptions = (value) => {
   $("#localServer_btn").attr("disabled", value);
   $("#liveLogs_btn").attr("disabled", value);
 };
+
+$("#checkNowBtn").click(()=>{
+  setUp();
+})
 
 $("#continueBtn").click(() => {
   var userName = $("#userNameFld").val();
@@ -195,6 +207,7 @@ $("#continueBtn").click(() => {
                   // $("#dashboardScreen").show(200);
                   console.log("nameSettingScreen is hidden");
                   $("#dashboardScreen").show(200);
+                  
                 });
               })
               .catch((error) => {
@@ -248,82 +261,49 @@ $("#continueBtn").click(() => {
 $("#refreshListOfServiceManagers").click(() => {
   $("#listOfServiceManagers_btn").trigger("click");
 });
+
 $("#listOfServiceManagers_btn").click(() => {
   $("#listOfServiceManagers_subScreen").show(200);
   $("#mysqlSettings_subScreen").hide("slow", function () {});
   $("#manageDatabases_subScreen").hide("slow", function () {});
   $("#localServer_subScreen").hide("slow", function () {});
   $("#liveLogs_subScreen").hide("slow", function () {});
-
+  $("#alreadyConnected_subScreen").hide();
   //lets render data into it.
 
-  $("#my_table_1").find("tr:gt(0)").remove();
-  getStoredHostUserName()
-    .then((hostName) => {
+  
+  getStoredServiceManagerEmailAddress()
+    .then((email) => {
       getStoredHostId()
         .then((hostId) => {
           $("#loadingGifForListOfServicecManagers").show();
           $("#noServiceProviderFound").hide();
-          sendRequestToCentralAPI("POST", LOAD_SERVICE_PROVIDERS_LIST, {
+          sendRequestToCentralAPI("POST", IS_HOST_CONNECTED, {
             hostId: hostId,
-            hostName: hostName,
+            serviceManagerEmail: email,
           })
             .then((resp) => resp.json())
             .then((response) => {
               console.log("response", response);
-              listOfServiceManagers = response.responsePayload;
-              response.responsePayload.forEach((manager, index) => {
-                manager.connectedHostList=manager.connectedHostList.filter(x => x !== null)
-                
-                let tableRow = ` <tr style="margin-top: 8%">
-    <th scope="row">${index + 1}</th>
-    <td>${manager.email}</td>
-    <td>${
-      manager.connectedHostList[0] != null
-        ? manager.connectedHostList[0].isConnected
-        : "Not Requested"
-    }</td>
-    <td>
-      <button
-        type="button"
-        style="width: 8rem;height:2.3rem;font-size:0.8rem"
-        class="btn btn-outline-primary"
-        id="connectBtn"
-        onClick= ${
-          manager.connectedHostList[0] != null
-            ? `makeDisConnectionRequest(${index})`
-            : `makeConnectionRequest(${index})`
-        }
-      >
-      ${
-        manager.connectedHostList[0] != null
-          ? manager.connectedHostList[0].isConnected == "Pending" ||
-            manager.connectedHostList[0].isConnected == "Dis-connect"
-            ? "Withdraw"
-            : "Dis-connect"
-          : "Make Request"
-      }
-      </button>
-    </td>
-  </tr>`;
-                $("#my_table_1").append(tableRow);
-              });
+              if(response.responseMessage=="Already Requested"){
+                $("#makingConnectionRequest_subScreen").hide();
+                $("#alreadyConnected_subScreen").show();
+                $("#alreadyConnected_subScreen").text("Already connected to :  "+email);
+              }else{
 
-              $("#loadingGifForListOfServicecManagers").hide();
-              if (response.responsePayload.length == 0) {
-                //show no host found
-                $("#noServiceProviderFound").show();
               }
             });
         })
         .catch((error) => {
-          alert("Could not find host id");
+          console.log(error)
+          // alert("Could not find host id");
         });
     })
     .catch((error) => {
-      alert("Could not find host name");
+      // alert("Could not find host name");
     });
 });
+
 
 $("#mysqlSettings_btn").click(() => {
   $("#listOfServiceManagers_subScreen").hide("slow", function () {});
@@ -553,8 +533,12 @@ $("#mySQLConForm").submit(function (event) {
 });
 
 //connection requests handlers
-
-const makeConnectionRequest = (index) => {
+$("#connectToServiceManager_btn").click(()=>{
+  let email = $("#serviceManagerEmail").val();
+  makeConnectionRequest(email);
+  // $("#serviceResponseWhileServiceManagerConnection").text("");
+})
+const makeConnectionRequest = (email) => {
   let target = listOfServiceManagers[index];
   // alert("connect"+target.email);
   getStoredHostId().then((hostId) => {
@@ -563,20 +547,23 @@ const makeConnectionRequest = (index) => {
       $("#pleaseWaitModal").modal("show");
       sendRequestToCentralAPI("POST", ADD_HOST_IN_REQUEST_LIST, {
         hostDeviceId: global.device_Id,
-        adminId: target.id,
-        hostName: hostName + "@" + target.email,
+        adminEmail:email,
+        hostName: hostName + "@" + email,
         hostId: hostId, //which we got from server
       }).then(
         async (success) => {
           const data = await success.json();
+          console.log("data of connection response : ",data)
           emitter.emit(Events.UPDATE_DEVICE_ID);
           $("#pleaseWaitModal_msg").text(data.responseMessage);
+          storeServiceManagerEmailAddress(email);
           setTimeout(() => {
+            $("#serviceResponseWhileServiceManagerConnection").text(data.responseMessage);
             $("#pleaseWaitModal").modal("hide");
           }, 3000);
         },
         (error) => {
-          alert(error);
+          // alert(error);
         }
       );
     });

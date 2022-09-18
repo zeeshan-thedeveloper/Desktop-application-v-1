@@ -87,6 +87,29 @@ const getStoredDatabasePermissions = () => {
   });
 };
 
+const storeServiceManagerEmailAddress = (value) => {
+  fs.writeFile(__dirname + "/ServiceManagerEmailAddress.txt", value, (err) => {
+    if (err) console.log(err);
+    console.log("Successfully Written database permissions  to File.", value);
+  });
+};
+
+const getStoredServiceManagerEmailAddress = () => {
+  return new Promise((resolve, reject) => {
+    fs.readFile(
+      __dirname + "/ServiceManagerEmailAddress.txt",
+      "utf-8",
+      (err, data) => {
+        if (err || data.length == 0) {
+          reject(null);
+        }
+        // console.log("value retrieved back : ",data)
+        resolve(data);
+      }
+    );
+  });
+};
+
 module.exports = {
   storeHostId,
   getStoredHostId,
@@ -96,4 +119,6 @@ module.exports = {
   getStoredHostMySQLConnectionDetails,
   storeDatabasePermissions,
   getStoredDatabasePermissions,
+  storeServiceManagerEmailAddress,
+  getStoredServiceManagerEmailAddress
 };

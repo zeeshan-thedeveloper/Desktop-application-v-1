@@ -35,6 +35,7 @@
   </head>
   <body>
     <!-- Getting user name screen -->
+    
     <div id="nameSettingScreen" class="nameSettingScreen">
       <div>
         <img src="images/IdeaRepresentative.png" width="400" height="400" />
@@ -180,10 +181,37 @@
                   Live Logs
                 </button>
               </div>
+              <div style="margin-top: 8%;">
+                <!-- List of admins -->
+                <p>
+                  <button class="btn btn-secondary" style="width: 70%" type="button" data-bs-toggle="collapse" data-bs-target="#collapseWidthExample" aria-expanded="false" aria-controls="collapseWidthExample">
+                    Status
+                  </button>
+                </p>
+                <div style="min-height: 120px; margin-left: 15%; text-align: center;">
+                  <div class="collapse collapse-horizontal" id="collapseWidthExample">
+                    <div class="card card-body" style="width:80%">
+                      <div style=" font-size: smaller;" id="hostName">
+                         
+                      </div>
+                      <div style=" font-size: smaller;" id="lastUpdateTime">
+                        Device Id Update :  
+                      </div>
+                      <div style=" font-size: smaller;" id="connectionStatus">
+                           Central server status: 
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  
+                </div>
+              </div>
             </div>
           </div>
           <div class="col-9">
-            <div id="listOfServiceManagers_subScreen" style="text-align: left">
+
+            <!-- <div id="listOfServiceManagers_subScreen" style="text-align: left">
               <div>
                 <div class="row">
                   <div class="col" style="text-align: right">
@@ -272,7 +300,65 @@
                 />
                 <div>No Service Manager Found</div>
               </div>
+            </div> -->
+            <div id="listOfServiceManagers_subScreen" style="text-align: center">
+              <div>
+                <div class="row">
+                  <div class="col" style="text-align: center">
+                    <div style="margin-top: 10%;margin-left: 5%;">
+                      <h4
+                        style="
+                          font-size: 1.5rem;
+                          font-weight: bold;
+                          letter-spacing: 4px;
+                        "
+                      >
+                        Service Manager
+                      </h4>
+                    </div>
+                  </div>
+
+                  
+                  
+                </div>
+                <div  style="text-align: center">
+                  <img
+                    src="./images/sammy-service-support.gif"
+                    width="150"
+                    height="150"
+                  />
+                </div>
+
+                <div id="makingConnectionRequest_subScreen">
+                <div style="text-align: center; width: 55%;margin-left: 25%;margin-top: 3%;">
+                  <label for="serviceManagerEmail" class="form-label">Service Manager Email</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="serviceManagerEmail"
+                    aria-describedby="emailHelp"
+                    placeholder="Email"
+                  />
+                </div>
+                <div style="margin-top: 3%;">
+                  <button
+                      id="connectToServiceManager_btn"
+                      type="button"
+                      class="btn btn-primary"
+                    >
+                      Connect
+                    </button>
+                </div>
+                <div>
+                  <div id="serviceResponseWhileServiceManagerConnection"></div>
+                </div>
+              </div>
+              <div id="alreadyConnected_subScreen">
+                
+              </div>
+              </div>
             </div>
+
 
             <div id="mysqlSettings_subScreen" style="text-align: left">
               <div style="border-bottom: 1px solid black">
@@ -456,7 +542,10 @@
             </div>
 
             <div id="localServer_subScreen">
-              <h5>Local server</h5>
+              <h3>Local Server</h3>
+              <div style="margin-top: 10%;"> 
+                This is feature which will allow to use this application for consuming databases locally .. it will be lighter then applications like XAMP,WAMP or MySQL Workbench. <br/> <b style="margin-top: 2%;"> <u> This feature will be introduced in version 2.0.</u> </b>
+              </div>
             </div>
 
             <div id="liveLogs_subScreen">

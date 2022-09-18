@@ -1,1 +1,1 @@
-[{"dbName":"salaries","isAllowedToUse":false},{"dbName":"users","isAllowedToUse":true}]
+[{"dbName":"banks","isAllowedToUse":false},{"dbName":"mydb","isAllowedToUse":false},{"dbName":"salaries","isAllowedToUse":false},{"dbName":"users","isAllowedToUse":true}]
